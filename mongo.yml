@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+  # Optional: A key/val pair from pod/deployment/configmap, etc
+  labels:
+    app: mongo
+    tier: database
+spec:
+  # How many pods will be created
+  # Note: here we cannot set +1, because the database should be a kind of statefulset and not the deployment
+  replicas: 1
+  selector:
+    # All the pods that match this laber belong to this deployment
+    matchLabels:
+      app: mongo
+  # Configuration of the pod within the configuration of the deployment
+  template:
+    metadata:
+      # Required field
+      labels:
+        app: mongo
+    spec:
+      # It is not usual to put more than one container in a pod
+      containers:
+      - name: mongodb
+        image: mongo:5.0
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          # Getting the value from secret 
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  # This forward the request to the pods with specific labels in Selector
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
