@@ -67,6 +67,7 @@ In order to get config map information you can run `kubectl get configmap` and `
 The NodePort Service is always accessible on each worker Node's IP address. In our case we just have one, which is minikube. So, we need the IP address of the minikube. In order to get minikube IP address we need to run `minikube ip` or `kubectl get node -o wide` command. Then you can see the application via your browser.
 
 > :warning: **Known issue - Minikube IP is not accessible through your browser**
+
 You can then access the web application by obtaining the external IP and port assigned to the webapp-service using:
 ```
 minikube service webapp-service
